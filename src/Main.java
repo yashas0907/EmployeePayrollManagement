@@ -93,10 +93,25 @@ public class Main {
             return;
         }
 
-        int id = readIntegerInput("Enter Employee ID: ");
+        Integer id = readPositiveEmployeeId("Enter Employee ID: ");
+        if (id == null) {
+            return;
+        }
+
         String name = readNonEmptyString("Enter Employee Name: ");
+        if (name.isEmpty()) {
+            return;
+        }
+
         String department = readNonEmptyString("Enter Department: ");
-        double basicSalary = readDoubleInput("Enter Basic Salary (Rs.): ");
+        if (department.isEmpty()) {
+            return;
+        }
+
+        Double basicSalary = readSalaryInput("Enter Basic Salary (Rs.): ");
+        if (basicSalary == null) {
+            return;
+        }
 
         try {
             Employee employee;
@@ -113,6 +128,8 @@ public class Main {
             System.out.println("\n[Error - Duplicate ID] " + e.getMessage());
         } catch (InvalidSalaryException e) {
             System.out.println("\n[Error - Invalid Salary] " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println("\n[Error - Invalid Input] " + e.getMessage());
         } catch (Exception e) {
             System.out.println("\n[Error] Failed to add employee: " + e.getMessage());
         }
@@ -124,7 +141,10 @@ public class Main {
 
     private static void handleSearchEmployee() {
         System.out.println("\n--- Search Employee ---");
-        int id = readIntegerInput("Enter Employee ID to search: ");
+        Integer id = readPositiveEmployeeId("Enter Employee ID to search: ");
+        if (id == null) {
+            return;
+        }
         try {
             Employee emp = employeeManager.getEmployeeById(id);
             System.out.println("\n[+] Employee Found:");
@@ -144,7 +164,10 @@ public class Main {
 
     private static void handleRemoveEmployee() {
         System.out.println("\n--- Remove Employee ---");
-        int id = readIntegerInput("Enter Employee ID to remove: ");
+        Integer id = readPositiveEmployeeId("Enter Employee ID to remove: ");
+        if (id == null) {
+            return;
+        }
         try {
             employeeManager.removeEmployee(id);
             System.out.println("\n[+] Success: Employee with ID " + id + " has been removed successfully.");
@@ -155,7 +178,10 @@ public class Main {
 
     private static void handleGeneratePayslip() {
         System.out.println("\n--- Generate Payslip ---");
-        int id = readIntegerInput("Enter Employee ID for payslip generation: ");
+        Integer id = readPositiveEmployeeId("Enter Employee ID for payslip generation: ");
+        if (id == null) {
+            return;
+        }
         try {
             payrollManager.generatePayslip(id);
             System.out.println("[+] Payslip generated and recorded in Payroll History.");
@@ -173,7 +199,7 @@ public class Main {
         while (true) {
             System.out.print(prompt);
             if (!scanner.hasNextLine()) {
-                return -1;
+                return 7; // Cleanly exit if input stream ends at menu
             }
             String input = scanner.nextLine().trim();
             try {
@@ -184,17 +210,54 @@ public class Main {
         }
     }
 
-    private static double readDoubleInput(String prompt) {
+    /**
+     * Reads a strictly positive Employee ID (> 0).
+     * Rejects zero and negative numbers.
+     * Returns null if stream is terminated, avoiding -1 conflict.
+     */
+    private static Integer readPositiveEmployeeId(String prompt) {
         while (true) {
             System.out.print(prompt);
             if (!scanner.hasNextLine()) {
-                return -1;
+                return null;
             }
             String input = scanner.nextLine().trim();
             try {
-                return Double.parseDouble(input);
+                int id = Integer.parseInt(input);
+                if (id <= 0) {
+                    System.out.println("[!] Invalid ID: " + id + ". Employee ID must be a strictly positive integer (> 0).");
+                    continue;
+                }
+                return id;
             } catch (NumberFormatException e) {
-                System.out.println("[!] Invalid input. Please enter a valid numeric value.");
+                System.out.println("[!] Invalid input. Please enter a valid whole number for Employee ID.");
+            }
+        }
+    }
+
+    /**
+     * Reads basic salary ensuring it is finite (not NaN, not Infinity) and strictly positive (> 0).
+     */
+    private static Double readSalaryInput(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            if (!scanner.hasNextLine()) {
+                return null;
+            }
+            String input = scanner.nextLine().trim();
+            try {
+                double salary = Double.parseDouble(input);
+                if (Double.isNaN(salary) || Double.isInfinite(salary)) {
+                    System.out.println("[!] Invalid salary: " + input + ". NaN and Infinity are not allowed.");
+                    continue;
+                }
+                if (salary <= 0.0) {
+                    System.out.println("[!] Invalid salary: " + salary + ". Basic salary must be strictly greater than 0.");
+                    continue;
+                }
+                return salary;
+            } catch (NumberFormatException e) {
+                System.out.println("[!] Invalid input. Please enter a valid numeric value for salary.");
             }
         }
     }

@@ -40,14 +40,17 @@ public class EmployeeManager {
 
     /**
      * Adds an employee to the custom singly linked list.
-     * Validates salary and checks for duplicate IDs.
+     * Validates employee ID, basic salary, and checks for duplicate IDs.
      */
     public void addEmployee(Employee emp) throws DuplicateEmployeeException, InvalidSalaryException {
         if (emp == null) {
             throw new IllegalArgumentException("Employee cannot be null.");
         }
-        if (emp.getBasicSalary() <= 0) {
-            throw new InvalidSalaryException("Basic salary must be greater than 0. Provided: " + emp.getBasicSalary());
+        if (emp.getId() <= 0) {
+            throw new IllegalArgumentException("Employee ID must be a strictly positive integer (> 0). Provided: " + emp.getId());
+        }
+        if (emp.getBasicSalary() <= 0 || Double.isNaN(emp.getBasicSalary()) || Double.isInfinite(emp.getBasicSalary())) {
+            throw new InvalidSalaryException("Basic salary must be finite and strictly greater than 0. Provided: " + emp.getBasicSalary());
         }
         if (searchEmployee(emp.getId()) != null) {
             throw new DuplicateEmployeeException("Employee with ID " + emp.getId() + " already exists.");
@@ -71,6 +74,9 @@ public class EmployeeManager {
      * Returns the Employee object if found, otherwise returns null.
      */
     public Employee searchEmployee(int id) {
+        if (id <= 0) {
+            return null;
+        }
         Node current = head;
         while (current != null) {
             if (current.data.getId() == id) {
@@ -85,6 +91,9 @@ public class EmployeeManager {
      * Gets an employee by ID or throws EmployeeNotFoundException if not present.
      */
     public Employee getEmployeeById(int id) throws EmployeeNotFoundException {
+        if (id <= 0) {
+            throw new EmployeeNotFoundException("Invalid Employee ID: " + id + ". ID must be a strictly positive integer (> 0).");
+        }
         Employee emp = searchEmployee(id);
         if (emp == null) {
             throw new EmployeeNotFoundException("Employee with ID " + id + " was not found.");
@@ -97,6 +106,9 @@ public class EmployeeManager {
      * Throws EmployeeNotFoundException if the employee does not exist.
      */
     public boolean removeEmployee(int id) throws EmployeeNotFoundException {
+        if (id <= 0) {
+            throw new EmployeeNotFoundException("Invalid Employee ID: " + id + ". ID must be a strictly positive integer (> 0).");
+        }
         if (head == null) {
             throw new EmployeeNotFoundException("Employee with ID " + id + " not found (Employee list is empty).");
         }
