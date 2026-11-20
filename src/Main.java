@@ -7,7 +7,9 @@ import exceptions.EmployeeNotFoundException;
 import exceptions.InvalidSalaryException;
 import payroll.PayrollHistory;
 import payroll.PayrollManager;
+import payroll.Payslip;
 
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -15,12 +17,13 @@ import java.util.Scanner;
  *
  * Menu Options:
  * 1. Add Employee (Full-Time / Part-Time)
- * 2. View Employees
- * 3. Search Employee
- * 4. Remove Employee
- * 5. Generate Payslip
- * 6. View Payroll History
- * 7. Exit
+ * 2. View / Sort Employees (Current, by ID, by Salary)
+ * 3. Search Employee (by ID or Department)
+ * 4. Update Employee Details
+ * 5. Remove Employee (with confirmation)
+ * 6. Generate Payslip (Single or Batch)
+ * 7. View Payroll History & Summary
+ * 8. Exit
  */
 public class Main {
     private static final Scanner scanner = new Scanner(System.in);
@@ -36,7 +39,7 @@ public class Main {
         boolean running = true;
         while (running) {
             displayMenu();
-            int choice = readIntegerInput("Enter your choice (1-7): ");
+            int choice = readIntegerInput("Enter your choice (1-8): ");
 
             switch (choice) {
                 case 1:
@@ -49,20 +52,23 @@ public class Main {
                     handleSearchEmployee();
                     break;
                 case 4:
-                    handleRemoveEmployee();
+                    handleUpdateEmployee();
                     break;
                 case 5:
-                    handleGeneratePayslip();
+                    handleRemoveEmployee();
                     break;
                 case 6:
-                    handleViewPayrollHistory();
+                    handleGeneratePayslip();
                     break;
                 case 7:
+                    handleViewPayrollHistory();
+                    break;
+                case 8:
                     System.out.println("\nThank you for using Employee Payroll Management System. Goodbye!");
                     running = false;
                     break;
                 default:
-                    System.out.println("\n[!] Invalid choice! Please select a number between 1 and 7.");
+                    System.out.println("\n[!] Invalid choice! Please select a number between 1 and 8.");
             }
         }
     }
@@ -72,12 +78,13 @@ public class Main {
         System.out.println("|                         MAIN MENU                           |");
         System.out.println("+-------------------------------------------------------------+");
         System.out.println("| 1. Add Employee                                             |");
-        System.out.println("| 2. View Employees                                           |");
-        System.out.println("| 3. Search Employee                                          |");
-        System.out.println("| 4. Remove Employee                                          |");
-        System.out.println("| 5. Generate Payslip                                         |");
-        System.out.println("| 6. View Payroll History                                     |");
-        System.out.println("| 7. Exit                                                     |");
+        System.out.println("| 2. View / Sort Employees                                    |");
+        System.out.println("| 3. Search Employee (by ID or Dept)                          |");
+        System.out.println("| 4. Update Employee Details                                  |");
+        System.out.println("| 5. Remove Employee                                          |");
+        System.out.println("| 6. Generate Payslip (Single / Batch)                        |");
+        System.out.println("| 7. View Payroll History & Summary                           |");
+        System.out.println("| 8. Exit                                                     |");
         System.out.println("+-------------------------------------------------------------+");
     }
 
@@ -136,11 +143,42 @@ public class Main {
     }
 
     private static void handleViewEmployees() {
+        System.out.println("\nView Employees Options:");
+        System.out.println("1. Display Current List");
+        System.out.println("2. Sort by ID (Ascending)");
+        System.out.println("3. Sort by Salary (Descending)");
+        int sortChoice = readIntegerInput("Enter choice (1-3): ");
+
+        if (sortChoice == 2) {
+            employeeManager.sortByIdAscending();
+            System.out.println("[*] List sorted by Employee ID in ascending order.");
+        } else if (sortChoice == 3) {
+            employeeManager.sortBySalaryDescending();
+            System.out.println("[*] List sorted by Basic Salary in descending order.");
+        }
         employeeManager.displayAllEmployees();
     }
 
     private static void handleSearchEmployee() {
         System.out.println("\n--- Search Employee ---");
+        System.out.println("1. Search by Employee ID");
+        System.out.println("2. Search by Department");
+        int searchChoice = readIntegerInput("Enter choice (1 or 2): ");
+
+        if (searchChoice == 2) {
+            String dept = readNonEmptyString("Enter Department to search: ");
+            List<Employee> results = employeeManager.searchByDepartment(dept);
+            if (results.isEmpty()) {
+                System.out.println("\n[!] No employees found in department: " + dept);
+            } else {
+                System.out.println("\n[+] Found " + results.size() + " employee(s) in " + dept + ":");
+                for (Employee e : results) {
+                    System.out.println(e);
+                }
+            }
+            return;
+        }
+
         Integer id = readPositiveEmployeeId("Enter Employee ID to search: ");
         if (id == null) {
             return;
@@ -162,15 +200,60 @@ public class Main {
         }
     }
 
+    private static void handleUpdateEmployee() {
+        System.out.println("\n--- Update Employee Details ---");
+        Integer id = readPositiveEmployeeId("Enter Employee ID to update: ");
+        if (id == null) {
+            return;
+        }
+
+        try {
+            Employee currentEmp = employeeManager.getEmployeeById(id);
+            System.out.printf("Current Record: %s (%s) | Dept: %s | Salary: Rs. %.2f\n",
+                    currentEmp.getName(), currentEmp.getEmployeeType(),
+                    currentEmp.getDepartment(), currentEmp.getBasicSalary());
+
+            String newName = readNonEmptyString("Enter New Name: ");
+            String newDept = readNonEmptyString("Enter New Department: ");
+            Double newSalary = readSalaryInput("Enter New Basic Salary (Rs.): ");
+            if (newSalary == null) {
+                return;
+            }
+
+            employeeManager.updateEmployee(id, newName, newDept, newSalary);
+            System.out.println("\n[+] Success: Employee details updated successfully!");
+            System.out.println(currentEmp);
+        } catch (EmployeeNotFoundException e) {
+            System.out.println("\n[Error - Not Found] " + e.getMessage());
+        } catch (InvalidSalaryException e) {
+            System.out.println("\n[Error - Invalid Salary] " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("\n[Error] Update failed: " + e.getMessage());
+        }
+    }
+
     private static void handleRemoveEmployee() {
         System.out.println("\n--- Remove Employee ---");
         Integer id = readPositiveEmployeeId("Enter Employee ID to remove: ");
         if (id == null) {
             return;
         }
+
         try {
-            employeeManager.removeEmployee(id);
-            System.out.println("\n[+] Success: Employee with ID " + id + " has been removed successfully.");
+            Employee emp = employeeManager.getEmployeeById(id);
+            System.out.printf("Found: ID %d - %s (%s, Dept: %s)\n",
+                    emp.getId(), emp.getName(), emp.getEmployeeType(), emp.getDepartment());
+            System.out.print("Are you sure you want to remove this employee? (y/n): ");
+            if (!scanner.hasNextLine()) {
+                return;
+            }
+            String confirm = scanner.nextLine().trim();
+            if (confirm.equalsIgnoreCase("y") || confirm.equalsIgnoreCase("yes")) {
+                employeeManager.removeEmployee(id);
+                System.out.println("\n[+] Success: Employee with ID " + id + " has been removed successfully.");
+            } else {
+                System.out.println("[*] Removal cancelled by user.");
+            }
         } catch (EmployeeNotFoundException e) {
             System.out.println("\n[Error - Not Found] " + e.getMessage());
         }
@@ -178,20 +261,56 @@ public class Main {
 
     private static void handleGeneratePayslip() {
         System.out.println("\n--- Generate Payslip ---");
-        Integer id = readPositiveEmployeeId("Enter Employee ID for payslip generation: ");
-        if (id == null) {
+        System.out.print("Enter Employee ID (or enter 0 to generate for ALL employees): ");
+        if (!scanner.hasNextLine()) {
             return;
         }
+        String input = scanner.nextLine().trim();
         try {
+            int id = Integer.parseInt(input);
+            if (id == 0) {
+                payrollManager.generateAllPayslips();
+                return;
+            }
+            if (id < 0) {
+                System.out.println("[!] Invalid ID: " + id + ". ID must be a strictly positive integer (> 0).");
+                return;
+            }
             payrollManager.generatePayslip(id);
             System.out.println("[+] Payslip generated and recorded in Payroll History.");
+        } catch (NumberFormatException e) {
+            System.out.println("[!] Invalid input. Please enter a valid numeric ID.");
         } catch (EmployeeNotFoundException e) {
             System.out.println("\n[Error - Not Found] " + e.getMessage());
         }
     }
 
     private static void handleViewPayrollHistory() {
-        payrollManager.viewPayrollHistory();
+        System.out.println("\n--- Payroll History Menu ---");
+        System.out.println("1. View Complete Transaction History");
+        System.out.println("2. Filter History by Employee ID");
+        System.out.println("3. View Cumulative Financial Summary");
+        int opt = readIntegerInput("Enter option (1-3): ");
+
+        if (opt == 2) {
+            Integer id = readPositiveEmployeeId("Enter Employee ID to filter history: ");
+            if (id == null) {
+                return;
+            }
+            List<Payslip> list = payrollHistory.getHistoryByEmployeeId(id);
+            if (list.isEmpty()) {
+                System.out.println("\n[!] No history records found for Employee ID: " + id);
+            } else {
+                System.out.println("\n[+] Found " + list.size() + " record(s) for Employee ID " + id + ":");
+                for (Payslip p : list) {
+                    System.out.println(p);
+                }
+            }
+        } else if (opt == 3) {
+            payrollManager.viewPayrollSummary();
+        } else {
+            payrollManager.viewPayrollHistory();
+        }
     }
 
     // Input validation helper methods
@@ -199,7 +318,7 @@ public class Main {
         while (true) {
             System.out.print(prompt);
             if (!scanner.hasNextLine()) {
-                return 7; // Cleanly exit if input stream ends at menu
+                return 8; // Cleanly exit if input stream ends at menu
             }
             String input = scanner.nextLine().trim();
             try {
