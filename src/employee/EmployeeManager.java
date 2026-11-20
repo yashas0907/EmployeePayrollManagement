@@ -244,10 +244,10 @@ public class EmployeeManager {
             return;
         }
 
-        System.out.println("\n" + "=".repeat(75));
+        System.out.println("\n===========================================================================");
         System.out.printf("%-5s | %-16s | %-12s | %-10s | %10s\n",
                 "ID", "Name", "Department", "Type", "Basic (Rs.)");
-        System.out.println("-".repeat(75));
+        System.out.println("---------------------------------------------------------------------------");
 
         Node current = head;
         while (current != null) {
@@ -256,7 +256,7 @@ public class EmployeeManager {
                     e.getId(), e.getName(), e.getDepartment(), e.getEmployeeType(), e.getBasicSalary());
             current = current.next;
         }
-        System.out.println("=".repeat(75));
+        System.out.println("===========================================================================");
         System.out.println("Total Employees: " + size);
     }
 

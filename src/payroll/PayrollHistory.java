@@ -42,12 +42,12 @@ public class PayrollHistory {
             return;
         }
 
-        System.out.println("\n" + "=".repeat(95));
+        System.out.println("\n===============================================================================================");
         System.out.println("                             PAYROLL TRANSACTION HISTORY");
-        System.out.println("=".repeat(95));
+        System.out.println("===============================================================================================");
         System.out.printf("%-9s | %-5s | %-16s | %-10s | %10s | %10s | %10s | %-11s\n",
                 "Slip ID", "EmpID", "Employee Name", "Type", "Gross", "Deductions", "Net Pay", "Date");
-        System.out.println("-".repeat(95));
+        System.out.println("-----------------------------------------------------------------------------------------------");
 
         for (Payslip p : historyList) {
             System.out.printf("%-9s | %-5d | %-16s | %-10s | %10.2f | %10.2f | %10.2f | %-11s\n",
@@ -55,7 +55,7 @@ public class PayrollHistory {
                     p.getEmployeeType(), p.getGrossSalary(), p.getTotalDeductions(),
                     p.getNetSalary(), p.getGenerationDate());
         }
-        System.out.println("=".repeat(95));
+        System.out.println("===============================================================================================");
         System.out.println("Total Records: " + historyList.size());
     }
 
