@@ -2,16 +2,20 @@ package employee;
 
 import salary.Allowance;
 import salary.Salary;
+import salary.SalaryCalculator;
 import deduction.Deduction;
+import deduction.TaxCalculator;
+import deduction.NetSalaryCalculator;
 
 /**
  * Abstract Base Class representing an Employee.
  * Demonstrates:
  * - Abstraction: Abstract class with abstract methods for specific employee behaviors.
  * - Encapsulation: Private member variables with public getters and setters.
+ * - Inheritance: Provides concrete, shared salary calculation logic to all subclasses.
  */
 public abstract class Employee {
-    private int id;
+    private final int id;
     private String name;
     private String department;
     private double basicSalary;
@@ -23,13 +27,9 @@ public abstract class Employee {
         this.basicSalary = basicSalary;
     }
 
-    // Getters and Setters
+    // Getters and Setters (ID has only a getter to ensure immutability)
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -56,13 +56,36 @@ public abstract class Employee {
         this.basicSalary = basicSalary;
     }
 
-    // Abstract methods demonstrating Polymorphism
+    // Abstract methods defining type-specific behavior (Polymorphism)
     public abstract String getEmployeeType();
     public abstract Allowance calculateAllowance();
-    public abstract Deduction calculateDeduction();
-    public abstract double calculateGrossSalary();
-    public abstract double calculateNetSalary();
-    public abstract Salary getSalaryBreakdown();
+
+    // Concrete shared salary calculations inherited by all employee types
+    public double calculateGrossSalary() {
+        Allowance allowance = calculateAllowance();
+        return SalaryCalculator.calculateGrossSalary(getBasicSalary(), allowance.getHra(), allowance.getDa());
+    }
+
+    public Deduction calculateDeduction() {
+        double gross = calculateGrossSalary();
+        double pf = NetSalaryCalculator.calculatePF(getBasicSalary());
+        double tax = TaxCalculator.calculateTax(gross);
+        return new Deduction(pf, tax);
+    }
+
+    public double calculateNetSalary() {
+        double gross = calculateGrossSalary();
+        Deduction deduction = calculateDeduction();
+        return NetSalaryCalculator.calculateNetSalary(gross, deduction.getTotalDeduction());
+    }
+
+    public Salary getSalaryBreakdown() {
+        Allowance allowance = calculateAllowance();
+        double gross = calculateGrossSalary();
+        Deduction deduction = calculateDeduction();
+        double net = calculateNetSalary();
+        return new Salary(getBasicSalary(), allowance, gross, deduction, net);
+    }
 
     @Override
     public String toString() {
