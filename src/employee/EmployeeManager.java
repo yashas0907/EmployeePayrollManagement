@@ -88,6 +88,27 @@ public class EmployeeManager {
     }
 
     /**
+     * Searches for all employees belonging to a specific department.
+     * Demonstrates multi-node linear search traversal over the singly linked list.
+     * Returns a List containing all matching employees (case-insensitive).
+     */
+    public List<Employee> searchByDepartment(String department) {
+        List<Employee> matches = new ArrayList<>();
+        if (department == null || department.trim().isEmpty()) {
+            return matches;
+        }
+        String targetDept = department.trim();
+        Node current = head;
+        while (current != null) {
+            if (current.data.getDepartment().equalsIgnoreCase(targetDept)) {
+                matches.add(current.data);
+            }
+            current = current.next;
+        }
+        return matches;
+    }
+
+    /**
      * Gets an employee by ID or throws EmployeeNotFoundException if not present.
      */
     public Employee getEmployeeById(int id) throws EmployeeNotFoundException {
