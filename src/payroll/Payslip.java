@@ -62,18 +62,18 @@ public class Payslip {
         System.out.println("\n+-------------------------------------------------------------+");
         System.out.println("|                    EMPLOYEE PAYSLIP                         |");
         System.out.println("+-------------------------------------------------------------+");
-        System.out.printf("| Payslip ID: %-15s Date: %-22s |\n", payslipId, generationDate);
-        System.out.printf("| Employee ID: %-14d Name: %-22s |\n", employeeId, employeeName);
-        System.out.printf("| Department: %-15s Type: %-22s |\n", department, employeeType);
+        System.out.printf("| Payslip ID: %-15s Date: %-23s |\n", payslipId, generationDate);
+        System.out.printf("| Employee ID: %-14d Name: %-23s |\n", employeeId, employeeName);
+        System.out.printf("| Department: %-15s Type: %-23s |\n", department, employeeType);
         System.out.println("+------------------------------+------------------------------+");
-        System.out.println("| EARNINGS                     | DEDUCTIONS                   |");
+        System.out.printf("| %-28s | %-28s |\n", "EARNINGS", "DEDUCTIONS");
         System.out.println("+------------------------------+------------------------------+");
-        System.out.printf("| Basic Salary:  %12.2f  | Provident Fund (PF):%8.2f |\n", basicSalary, pf);
-        System.out.printf("| HRA (20%%):    %12.2f  | Income Tax:         %8.2f |\n", hra, tax);
-        System.out.printf("| DA (%s):      %12.2f  |                              |\n",
-                employeeType.equalsIgnoreCase("Full-Time") ? "10%" : " 0%", da);
+        System.out.printf("| Basic Salary: %14.2f | Provident Fund:%13.2f |\n", basicSalary, pf);
+        System.out.printf("| HRA (20%%):    %14.2f | Income Tax:    %13.2f |\n", hra, tax);
+        System.out.printf("| DA (%-4s):    %14.2f | %-28s |\n",
+                employeeType.equalsIgnoreCase("Full-Time") ? "10%" : "0%", da, "");
         System.out.println("+------------------------------+------------------------------+");
-        System.out.printf("| Gross Salary:  %12.2f  | Total Deductions:   %8.2f |\n", grossSalary, totalDeductions);
+        System.out.printf("| Gross Salary: %14.2f | Total Ded.:    %13.2f |\n", grossSalary, totalDeductions);
         System.out.println("+------------------------------+------------------------------+");
         System.out.printf("| NET PAYABLE SALARY:                   Rs. %17.2f |\n", netSalary);
         System.out.println("+-------------------------------------------------------------+");
