@@ -2,13 +2,18 @@ package salary;
 
 /**
  * Represents the allowances granted to an employee.
- * Encapsulates HRA (House Rent Allowance) and DA (Dearness Allowance).
+ * Encapsulates HRA (House Rent Allowance) and DA (Dearness Allowance)
+ * with defensive validation ensuring non-negative values.
  */
 public class Allowance {
     private double hra;
     private double da;
 
     public Allowance(double hra, double da) {
+        if (hra < 0 || da < 0) {
+            throw new IllegalArgumentException(
+                    String.format("Allowance components cannot be negative. HRA: %.2f, DA: %.2f", hra, da));
+        }
         this.hra = hra;
         this.da = da;
     }
@@ -18,6 +23,9 @@ public class Allowance {
     }
 
     public void setHra(double hra) {
+        if (hra < 0) {
+            throw new IllegalArgumentException("HRA cannot be negative: " + hra);
+        }
         this.hra = hra;
     }
 
@@ -26,6 +34,9 @@ public class Allowance {
     }
 
     public void setDa(double da) {
+        if (da < 0) {
+            throw new IllegalArgumentException("DA cannot be negative: " + da);
+        }
         this.da = da;
     }
 
