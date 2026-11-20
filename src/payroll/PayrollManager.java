@@ -35,6 +35,35 @@ public class PayrollManager {
         payrollHistory.displayHistory();
     }
 
+    /**
+     * Generates payslips in batch for all registered employees and records them in history.
+     */
+    public int generateAllPayslips() {
+        java.util.List<Employee> all = employeeManager.getAllEmployees();
+        if (all.isEmpty()) {
+            System.out.println("\n[!] No registered employees found for batch payroll generation.");
+            return 0;
+        }
+
+        System.out.println("\n=== BATCH PAYROLL GENERATION IN PROGRESS ===");
+        int count = 0;
+        for (Employee emp : all) {
+            Payslip slip = PayslipGenerator.generate(emp);
+            payrollHistory.addPayslip(slip);
+            slip.printPayslip();
+            count++;
+        }
+        System.out.println("\n[+] Batch payroll complete: " + count + " payslip(s) generated and recorded.");
+        return count;
+    }
+
+    /**
+     * Displays summary statistics of all generated payroll transactions.
+     */
+    public void viewPayrollSummary() {
+        payrollHistory.displayPayrollSummary();
+    }
+
     public PayrollHistory getPayrollHistory() {
         return payrollHistory;
     }
