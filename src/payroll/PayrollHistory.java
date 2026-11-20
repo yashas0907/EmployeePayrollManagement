@@ -66,4 +66,51 @@ public class PayrollHistory {
     public int getRecordCount() {
         return historyList.size();
     }
+
+    public double getTotalDisbursedSalary() {
+        double total = 0.0;
+        for (Payslip p : historyList) {
+            total += p.getNetSalary();
+        }
+        return total;
+    }
+
+    public double getTotalTaxCollected() {
+        double total = 0.0;
+        for (Payslip p : historyList) {
+            total += p.getTax();
+        }
+        return total;
+    }
+
+    public double getTotalPfDeposited() {
+        double total = 0.0;
+        for (Payslip p : historyList) {
+            total += p.getPf();
+        }
+        return total;
+    }
+
+    public void displayPayrollSummary() {
+        if (historyList.isEmpty()) {
+            System.out.println("\n[!] No payroll transactions recorded yet.");
+            return;
+        }
+
+        double totalGross = 0.0;
+        for (Payslip p : historyList) {
+            totalGross += p.getGrossSalary();
+        }
+
+        System.out.println("\n+-------------------------------------------------------------+");
+        System.out.println("|                 CUMULATIVE PAYROLL SUMMARY                  |");
+        System.out.println("+-------------------------------------------------------------+");
+        System.out.printf("| Total Transactions: %-39d |\n", historyList.size());
+        System.out.printf("| Total Gross Disbursed:                Rs. %17.2f |\n", totalGross);
+        System.out.printf("| Total PF Deposited:                   Rs. %17.2f |\n", getTotalPfDeposited());
+        System.out.printf("| Total Tax Collected:                  Rs. %17.2f |\n", getTotalTaxCollected());
+        System.out.println("+-------------------------------------------------------------+");
+        System.out.printf("| NET TOTAL DISBURSED:                  Rs. %17.2f |\n", getTotalDisbursedSalary());
+        System.out.println("+-------------------------------------------------------------+");
+    }
 }
