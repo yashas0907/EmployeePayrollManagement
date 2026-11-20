@@ -1,202 +1,271 @@
 # Employee Payroll Management System
 
-A console-based Core Java application designed to manage employee records, compute dynamic salaries with real-world allowances and tax deductions, generate itemized payslips, and maintain payroll transaction history.
+A console-based Core Java application for managing employee records, computing salaries with real-world allowances and tax deductions, generating itemized payslips, and maintaining payroll transaction history.
 
-Developed with pure Core Java (no external frameworks or databases) adhering strictly to Object-Oriented Programming (OOP) principles, a custom Data Structure implemented from scratch, Java Collections, and custom exception handling.
-
----
-
-## 1. Project Overview
-
-The Employee Payroll Management System provides a clean, robust, and beginner-friendly solution for organizations to manage full-time and part-time staff. It features automated salary calculations incorporating:
-- House Rent Allowance (HRA)
-- Dearness Allowance (DA)
-- Provident Fund (PF)
-- Slab-based Income Tax deductions
-- Detailed printable Payslips
-- Historical transaction logging
+Built with **pure Core Java** — no external frameworks, no database, no GUI. Demonstrates OOP, a custom Data Structure from scratch, the Java Collections Framework, and custom exception handling.
 
 ---
 
-## 2. Key Features
+## Features
 
-1. **Add Employee**: Register new Full-Time or Part-Time employees with automated validation for unique IDs and positive salary figures.
-2. **View Employees**: Display all registered employees in a clean tabular view directly from the custom singly linked list.
-3. **Search Employee**: Search for an employee by ID and view complete profile details and current salary breakdown.
-4. **Remove Employee**: Unlink and delete an employee record by ID with proper exception handling if not found.
-5. **Generate Payslip**: Calculate gross earnings, deductions, and net salary, printing a formatted payslip and saving the transaction to payroll history.
-6. **View Payroll History**: View all generated payslips across sessions using Java Collections (`ArrayList`).
-7. **Input Validation**: Clean handling of invalid numeric inputs, negative salaries, duplicate records, and non-existent IDs.
+1. **Add Employee** — Register Full-Time or Part-Time employees with strict ID and salary validation.
+2. **View / Sort Employees** — Display employees in insertion order, sorted by ID (ascending), or sorted by Basic Salary (descending).
+3. **Search Employee** — Look up employees by ID or filter by department name (case-insensitive).
+4. **Update Employee Details** — Modify an employee's name, department, and salary in-place while preserving their type and linked-list position.
+5. **Remove Employee** — Delete an employee record with an interactive confirmation prompt to prevent accidental deletion.
+6. **Generate Payslip** — Generate a formatted payslip for a single employee or run batch generation for all employees at once.
+7. **View Payroll History & Summary** — View the complete payslip transaction log, filter history by employee ID, or display aggregate financial totals (gross, PF, tax, net).
+8. **Exit**
 
 ---
 
-## 3. Project Structure
+## Project Structure
 
 ```
 EmployeePayrollManagement/
 ├── src/
 │   ├── employee/
-│   │   ├── Employee.java
-│   │   ├── FullTimeEmployee.java
-│   │   ├── PartTimeEmployee.java
-│   │   └── EmployeeManager.java
+│   │   ├── Employee.java              # Abstract base class (Abstraction, Encapsulation)
+│   │   ├── FullTimeEmployee.java      # Subclass: HRA 20% + DA 10%
+│   │   ├── PartTimeEmployee.java      # Subclass: HRA 20% + DA 0%
+│   │   └── EmployeeManager.java       # Custom Singly Linked List DSA
 │   ├── salary/
-│   │   ├── Salary.java
-│   │   ├── SalaryCalculator.java
-│   │   └── Allowance.java
+│   │   ├── Salary.java                # Salary breakdown model
+│   │   ├── SalaryCalculator.java      # HRA, DA, Gross calculation
+│   │   └── Allowance.java             # Allowance model with validation
 │   ├── deduction/
-│   │   ├── Deduction.java
-│   │   ├── TaxCalculator.java
-│   │   └── NetSalaryCalculator.java
+│   │   ├── Deduction.java             # Deduction model (PF + Tax) with validation
+│   │   ├── TaxCalculator.java         # Tax slab logic
+│   │   └── NetSalaryCalculator.java   # PF and Net Salary calculation
 │   ├── payroll/
-│   │   ├── Payslip.java
-│   │   ├── PayslipGenerator.java
-│   │   ├── PayrollHistory.java
-│   │   └── PayrollManager.java
+│   │   ├── Payslip.java               # Payslip model and formatted print
+│   │   ├── PayslipGenerator.java      # Builds Payslip objects, assigns IDs
+│   │   ├── PayrollHistory.java        # ArrayList-based transaction log & aggregations
+│   │   └── PayrollManager.java        # Coordinator: single & batch payslip ops
 │   ├── exceptions/
 │   │   ├── DuplicateEmployeeException.java
 │   │   ├── InvalidSalaryException.java
 │   │   └── EmployeeNotFoundException.java
-│   └── Main.java
+│   ├── Main.java                      # Console UI and menu
+│   └── PayrollSystemTest.java         # Standalone automated test suite (13 tests)
 └── README.md
 ```
 
 ---
 
-## 4. Object-Oriented Programming (OOP) Concepts Used
+## OOP Concepts Demonstrated
 
-- **Abstraction**:
-  - `Employee` is an abstract base class defining the contract for employee behavior (`calculateAllowance()`, `calculateDeduction()`, `calculateGrossSalary()`, `calculateNetSalary()`, `getEmployeeType()`).
-  - Implementation details are hidden from callers like `EmployeeManager` and `Main`.
-- **Encapsulation**:
-  - All domain fields (e.g., `id`, `name`, `basicSalary`, `hra`, `da`, `pf`, `tax`) are declared `private`.
-  - Controlled read and write access is exposed via public getter and setter methods.
-- **Inheritance**:
-  - `FullTimeEmployee` and `PartTimeEmployee` inherit core attributes and common methods from the `Employee` base class using the `extends` keyword.
-  - Custom exceptions inherit from `java.lang.Exception`.
-- **Polymorphism**:
-  - Dynamic Method Dispatch (Runtime Polymorphism): `FullTimeEmployee` and `PartTimeEmployee` provide specialized implementations for `calculateAllowance()` and `getEmployeeType()`.
-  - Calling `employee.calculateNetSalary()` executes the appropriate subclass logic dynamically.
-
----
-
-## 5. Custom Data Structure (DSA from Scratch)
-
-To fulfill academic and faculty requirements, employee records are stored in a **Custom Singly Linked List** implemented inside `EmployeeManager.java`:
-
-- **Node Structure**:
-  ```java
-  private static class Node {
-      Employee data;
-      Node next;
-  }
-  ```
-- **Operations Implemented**:
-  - **Insertion**: Appends new nodes to the tail of the linked list ($O(n)$ traversal, preserving insertion order).
-  - **Search**: Linear traversal through nodes comparing employee IDs ($O(n)$ time complexity).
-  - **Deletion**: Linear traversal updating pointers to bypass and unlink target nodes ($O(n)$ time complexity).
-  - **Display / Traversal**: Iterating from `head` through `next` pointers to display formatted output.
-
----
-
-## 6. Java Collections Framework
-
-- **`ArrayList<Payslip>`** in `PayrollHistory.java`:
-  - Used meaningfully to maintain chronological records of all generated payslips.
-  - Provides dynamic array resizing, random access, and filtering by employee ID.
-
----
-
-## 7. Custom Exceptions
-
-Three domain-specific checked exceptions are defined and handled with `try-catch` blocks:
-
-1. **`DuplicateEmployeeException`**: Thrown when attempting to register an employee whose ID already exists in the singly linked list.
-2. **`InvalidSalaryException`**: Thrown when an entered basic salary is less than or equal to 0.
-3. **`EmployeeNotFoundException`**: Thrown when searching, removing, or generating a payslip for a non-existent employee ID.
-
----
-
-## 8. Salary Calculation Rules
-
-The financial logic is strictly consistent across the entire application:
-
-| Component | Rule / Rate |
+| Concept | Where |
 | :--- | :--- |
-| **HRA (House Rent Allowance)** | 20% of Basic Salary (Both Full-Time and Part-Time) |
-| **DA (Dearness Allowance)** | 10% of Basic Salary for **Full-Time**; **0%** for **Part-Time** |
-| **Gross Salary** | `Basic Salary + HRA + DA` |
-| **PF (Provident Fund)** | 12% of Basic Salary |
-| **Income Tax** | Calculated on **Gross Salary**: <br>• Gross ≤ 50,000: **0%** <br>• 50,000 < Gross ≤ 100,000: **10%** <br>• Gross > 100,000: **20%** |
-| **Net Salary** | `Gross Salary - PF - Income Tax` |
-
-### Calculation Example:
-- **Full-Time Employee** with Basic Salary = ₹60,000:
-  - HRA (20%) = ₹12,000
-  - DA (10%) = ₹6,000
-  - Gross Salary = ₹60,000 + ₹12,000 + ₹6,000 = **₹78,000**
-  - PF (12% of basic) = ₹7,200
-  - Tax (10% of gross ₹78,000) = ₹7,800
-  - Total Deductions = ₹7,200 + ₹7,800 = ₹15,000
-  - Net Payable Salary = ₹78,000 - ₹15,000 = **₹63,000**
-
-- **Part-Time Employee** with Basic Salary = ₹40,000:
-  - HRA (20%) = ₹8,000
-  - DA (0%) = ₹0
-  - Gross Salary = ₹40,000 + ₹8,000 + ₹0 = **₹48,000**
-  - PF (12% of basic) = ₹4,800
-  - Tax (0% since Gross ≤ 50,000) = ₹0
-  - Total Deductions = ₹4,800
-  - Net Payable Salary = ₹48,000 - ₹4,800 = **₹43,200**
+| **Abstraction** | `Employee` is abstract. Callers like `Main` and `PayrollManager` work through the `Employee` reference without knowing the concrete type. |
+| **Encapsulation** | All fields in `Employee`, `Allowance`, `Deduction`, `Salary`, `Payslip` are `private` with controlled public getters/setters including validation. |
+| **Inheritance** | `FullTimeEmployee` and `PartTimeEmployee` extend `Employee`, inheriting all shared salary calculations. Only `calculateAllowance()` and `getEmployeeType()` are overridden. |
+| **Polymorphism** | A `List<Employee>` can hold both `FullTimeEmployee` and `PartTimeEmployee` objects. Calling `emp.calculateGrossSalary()` automatically uses the correct allowance logic for each type at runtime. |
 
 ---
 
-## 9. Compilation and Execution Instructions
+## Custom Data Structure (DSA from Scratch)
+
+**Singly Linked List** implemented in `EmployeeManager.java`:
+
+```
+head -> [Node: E1] -> [Node: E2] -> [Node: E3] -> null
+```
+
+| Operation | Method | Time Complexity |
+| :--- | :--- | :--- |
+| Insert (at tail) | `addEmployee()` | O(n) |
+| Search by ID | `searchEmployee(id)` | O(n) |
+| Search by Department | `searchByDepartment(dept)` | O(n) |
+| Update in-place | `updateEmployee(id, ...)` | O(n) |
+| Delete by ID | `removeEmployee(id)` | O(n) |
+| Sort by ID or Salary | `sortByIdAscending()` / `sortBySalaryDescending()` | O(n²) Bubble Sort |
+| Display all | `displayAllEmployees()` | O(n) |
+
+> **Why a custom Linked List?** To satisfy the DSA faculty requirement: implementing pointer manipulation (`head`, `Node.next`) from scratch instead of relying on Java's built-in `LinkedList`.
+
+---
+
+## Java Collections Framework
+
+`ArrayList<Payslip>` is used in `PayrollHistory.java` to maintain a chronological transaction log of all generated payslips.
+
+| Feature | Usage |
+| :--- | :--- |
+| `ArrayList.add()` | Record each generated payslip |
+| `ArrayList` iteration | Filter by employee ID, compute aggregates |
+| `Collections.unmodifiableList()` | Defensive read-only view for external callers |
+| Aggregate methods | `getTotalDisbursedSalary()`, `getTotalTaxCollected()`, `getTotalPfDeposited()` |
+
+> **Why ArrayList for history but custom LinkedList for employees?** The LinkedList demonstrates DSA from scratch. The ArrayList is the standard Java Collections Framework choice for sequential records with fast random access and dynamic resizing — both are used deliberately for different purposes.
+
+---
+
+## Custom Exceptions
+
+All three exceptions extend `java.lang.Exception` (checked), include `serialVersionUID`, and provide three constructors each:
+
+| Exception | When Thrown |
+| :--- | :--- |
+| `DuplicateEmployeeException` | Adding an employee whose ID already exists in the linked list |
+| `InvalidSalaryException` | Salary is `<= 0`, `NaN`, or `Infinity` |
+| `EmployeeNotFoundException` | Search, remove, or update for a non-existent employee ID |
+
+---
+
+## Salary Calculation Rules
+
+All rules are enforced uniformly through `SalaryCalculator`, `TaxCalculator`, and `NetSalaryCalculator`.
+
+| Component | Rule |
+| :--- | :--- |
+| **HRA** | 20% of Basic Salary (both types) |
+| **DA** | 10% of Basic Salary for Full-Time; **0%** for Part-Time |
+| **Gross Salary** | Basic + HRA + DA |
+| **PF (Provident Fund)** | 12% of Basic Salary |
+| **Income Tax** | On Gross Salary: ≤ 50,000 → **0%** · 50,001–1,00,000 → **10%** · > 1,00,000 → **20%** |
+| **Net Salary** | Gross − PF − Tax |
+
+### Worked Example
+
+**Full-Time, Basic = ₹60,000:**
+
+| Step | Calculation | Amount |
+| :--- | :--- | ---: |
+| HRA | 20% × 60,000 | ₹12,000 |
+| DA | 10% × 60,000 | ₹6,000 |
+| **Gross Salary** | 60,000 + 12,000 + 6,000 | **₹78,000** |
+| PF | 12% × 60,000 | ₹7,200 |
+| Tax | 10% × 78,000 (Gross in 50k–100k slab) | ₹7,800 |
+| **Net Salary** | 78,000 − 7,200 − 7,800 | **₹63,000** |
+
+**Part-Time, Basic = ₹40,000:**
+
+| Step | Calculation | Amount |
+| :--- | :--- | ---: |
+| HRA | 20% × 40,000 | ₹8,000 |
+| DA | 0% (Part-Time) | ₹0 |
+| **Gross Salary** | 40,000 + 8,000 + 0 | **₹48,000** |
+| PF | 12% × 40,000 | ₹4,800 |
+| Tax | 0% (Gross ≤ 50,000) | ₹0 |
+| **Net Salary** | 48,000 − 4,800 − 0 | **₹43,200** |
+
+---
+
+## Compile and Run
 
 ### Prerequisites
-- Java Development Kit (JDK 8 or higher, e.g. JDK 17, 21).
+Java Development Kit (JDK) **8 or later** (tested on JDK 8 through JDK 26).
 
-### Step 1: Open Terminal
-Navigate to the root directory `EmployeePayrollManagement`:
+### Step 1: Navigate to project root
 ```bash
 cd EmployeePayrollManagement
 ```
 
-### Step 2: Compile All Sources
-Compile all packages into an output directory `bin`:
+### Step 2: Create the bin output directory (first time only)
 ```bash
-# Windows (Command Prompt or PowerShell)
-javac -d bin src/exceptions/*.java src/salary/*.java src/deduction/*.java src/employee/*.java src/payroll/*.java src/Main.java
+# Windows
+mkdir bin
 
 # macOS / Linux
+mkdir -p bin
+```
+
+### Step 3: Compile
+```bash
 javac -d bin src/exceptions/*.java src/salary/*.java src/deduction/*.java src/employee/*.java src/payroll/*.java src/Main.java
 ```
 
-### Step 3: Run the Application
+### Step 4: Run the application
 ```bash
-# Windows / macOS / Linux
 java -cp bin Main
+```
+
+### Step 5: Run the automated test suite
+```bash
+javac -d bin src/exceptions/*.java src/salary/*.java src/deduction/*.java src/employee/*.java src/payroll/*.java src/Main.java src/PayrollSystemTest.java
+java -cp bin PayrollSystemTest
 ```
 
 ---
 
-## 10. Sample Menu Interface
+## Git Commit History
 
-```text
-===============================================================
-      WELCOME TO EMPLOYEE PAYROLL MANAGEMENT SYSTEM           
-===============================================================
+| Commit | Description |
+| :--- | :--- |
+| `8fef1e8` | Initial commit: Core Java employee payroll management system |
+| `40b2185` | Fix employee ID and salary input validation |
+| `0ae08b5` | Refactor common salary calculations into Employee base class |
+| `6effae5` | Standardize custom exception constructors and serialVersionUID |
+| `8a94bf6` | Add in-place employee record update in custom linked list |
+| `06bdfae` | Add department search traversal to custom linked list |
+| `e1bd88f` | Implement in-place bubble sort on custom singly linked list |
+| `8621683` | Replace String.repeat with portable borders for Java 8 compatibility |
+| `231c137` | Add defensive input validation to Allowance and Deduction models |
+| `065f7bc` | Standardize ASCII table border alignment in Payslip view |
+| `8142313` | Add financial summary aggregations to PayrollHistory Collections |
+| `737059e` | Add batch payslip generation and summary view to PayrollManager |
+| `9bca5f1` | Update console menu with confirmation prompts, employee update and sorting |
+| `b6c2c32` | Add standalone automated regression test suite for payroll system |
+| `(this)` | Complete README with viva preparation guide |
 
-+-------------------------------------------------------------+
-|                         MAIN MENU                           |
-+-------------------------------------------------------------+
-| 1. Add Employee                                             |
-| 2. View Employees                                           |
-| 3. Search Employee                                          |
-| 4. Remove Employee                                          |
-| 5. Generate Payslip                                         |
-| 6. View Payroll History                                     |
-| 7. Exit                                                     |
-+-------------------------------------------------------------+
-Enter your choice (1-7): 
-```
+---
+
+## Viva Preparation — Frequently Asked Questions
+
+### Q1: Why did you use a custom Singly Linked List instead of Java's built-in `ArrayList` or `LinkedList`?
+
+**Answer:** The purpose is to demonstrate Data Structures and Algorithms (DSA) from scratch. I implemented the `Node` class with a `data` field and a `next` pointer and manually coded insertion, traversal, search, in-place deletion, in-place update, department-based filtering, and bubble sort entirely using pointer manipulation. This is not possible or meaningful when using a built-in collection because the internal structure is hidden. The custom implementation proves that I understand how linked structures work at a fundamental level.
+
+---
+
+### Q2: If you already have a custom Linked List, why do you also use `ArrayList` for `PayrollHistory`?
+
+**Answer:** They serve different purposes. The Linked List satisfies the DSA requirement for the employee registry — records need to be inserted, searched, updated, and deleted frequently. The `ArrayList<Payslip>` satisfies the Java Collections Framework requirement for the payroll audit log — payslip records are only ever added and read sequentially, so `ArrayList` is the right tool: it provides O(1) amortized appending, fast iteration for aggregation, and integrates naturally with `Collections.unmodifiableList()` for encapsulation. Using both deliberately demonstrates sound design judgment.
+
+---
+
+### Q3: Why is `Employee` an abstract class instead of an interface?
+
+**Answer:** Because employees share both **state** (id, name, department, basicSalary) and **shared concrete behaviour** (calculateGrossSalary, calculateDeduction, calculateNetSalary). Interfaces in Java cannot hold instance variables, so sharing state through an interface is not possible. An abstract class lets me define the common fields and implement the shared calculation logic once, while still enforcing that every subclass provides its own allowance logic through the abstract `calculateAllowance()` method.
+
+---
+
+### Q4: What OOP concept is demonstrated when `employeeManager.getAllEmployees()` returns a list containing both `FullTimeEmployee` and `PartTimeEmployee` objects, and you call `calculateNetSalary()` on each?
+
+**Answer:** This is **Runtime Polymorphism** (dynamic method dispatch). The variable is typed as `Employee`, but at runtime the JVM checks the actual object type and calls the correct overridden `calculateAllowance()` method — either the Full-Time version (HRA 20% + DA 10%) or the Part-Time version (HRA 20%, DA 0%). The salary calculation logic then flows correctly from the base class using the allowance returned by the subclass.
+
+---
+
+### Q5: Why are your custom exceptions checked exceptions rather than unchecked (RuntimeException)?
+
+**Answer:** `DuplicateEmployeeException`, `InvalidSalaryException`, and `EmployeeNotFoundException` represent **expected, recoverable business errors** — not programming bugs. Using checked exceptions forces the caller (like `Main.java`) to explicitly write `try-catch` blocks and handle each failure gracefully with a user-friendly message. If they were unchecked, the compiler would not enforce handling and the errors could crash the application silently.
+
+---
+
+### Q6: Why did you use `double` instead of `BigDecimal` for salary amounts?
+
+**Answer:** For this academic console project, `double` is appropriate. The values are formatted with `printf("%.2f")` throughout the application, which rounds to 2 decimal places on display. `BigDecimal` would be the correct choice in an enterprise or banking system to prevent IEEE-754 binary floating-point rounding errors (e.g., `0.1 + 0.2` ≠ `0.3` exactly). I am aware of this trade-off and can explain when each is appropriate.
+
+---
+
+### Q7: What is the time complexity of your Bubble Sort and can you improve it?
+
+**Answer:** The worst-case time complexity of Bubble Sort is **O(n²)** — for each of the n passes, we compare up to n-1 adjacent pairs. For a small employee registry this is perfectly acceptable. The optimised version I implemented adds an early termination flag (`swapped`): if a full pass makes zero swaps, the list is already sorted and we stop immediately, giving a best-case complexity of **O(n)** for already-sorted input. For large datasets, Merge Sort on a linked list at **O(n log n)** would be a superior alternative.
+
+---
+
+### Q8: Explain the salary rules for Full-Time and Part-Time employees.
+
+**Answer:**
+
+| Component | Full-Time | Part-Time |
+| :--- | :--- | :--- |
+| HRA | 20% of Basic | 20% of Basic |
+| DA | **10% of Basic** | **0%** |
+| Gross | Basic + HRA + DA | Basic + HRA |
+| PF | 12% of Basic | 12% of Basic |
+| Tax | On Gross (slab) | On Gross (slab) |
+| Net | Gross − PF − Tax | Gross − PF − Tax |
+
+Tax slabs: Gross ≤ ₹50,000 → 0%; ₹50,001–₹1,00,000 → 10%; > ₹1,00,000 → 20%.
