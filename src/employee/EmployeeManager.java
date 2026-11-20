@@ -137,6 +137,36 @@ public class EmployeeManager {
     }
 
     /**
+     * Updates an existing employee's details (name, department, basic salary) in-place.
+     * Preserves the employee's Full-Time or Part-Time type and maintains linked list integrity.
+     */
+    public boolean updateEmployee(int id, String newName, String newDept, double newSalary)
+            throws EmployeeNotFoundException, InvalidSalaryException {
+        if (id <= 0) {
+            throw new EmployeeNotFoundException("Invalid Employee ID: " + id + ". ID must be a strictly positive integer (> 0).");
+        }
+        if (newSalary <= 0 || Double.isNaN(newSalary) || Double.isInfinite(newSalary)) {
+            throw new InvalidSalaryException("Basic salary must be finite and strictly greater than 0. Provided: " + newSalary);
+        }
+        if (newName == null || newName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Employee name cannot be empty.");
+        }
+        if (newDept == null || newDept.trim().isEmpty()) {
+            throw new IllegalArgumentException("Department cannot be empty.");
+        }
+
+        Employee emp = searchEmployee(id);
+        if (emp == null) {
+            throw new EmployeeNotFoundException("Employee with ID " + id + " was not found for update.");
+        }
+
+        emp.setName(newName.trim());
+        emp.setDepartment(newDept.trim());
+        emp.setBasicSalary(newSalary);
+        return true;
+    }
+
+    /**
      * Displays all employees by traversing the linked list.
      */
     public void displayAllEmployees() {
