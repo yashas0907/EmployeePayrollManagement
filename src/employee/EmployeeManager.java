@@ -188,6 +188,54 @@ public class EmployeeManager {
     }
 
     /**
+     * Sorts the custom singly linked list in-place by Employee ID in ascending order.
+     * Uses the Bubble Sort algorithm swapping node data pointers directly.
+     */
+    public void sortByIdAscending() {
+        if (head == null || head.next == null) {
+            return;
+        }
+        boolean swapped;
+        do {
+            swapped = false;
+            Node current = head;
+            while (current.next != null) {
+                if (current.data.getId() > current.next.data.getId()) {
+                    Employee temp = current.data;
+                    current.data = current.next.data;
+                    current.next.data = temp;
+                    swapped = true;
+                }
+                current = current.next;
+            }
+        } while (swapped);
+    }
+
+    /**
+     * Sorts the custom singly linked list in-place by Basic Salary in descending order.
+     * Uses the Bubble Sort algorithm swapping node data pointers directly.
+     */
+    public void sortBySalaryDescending() {
+        if (head == null || head.next == null) {
+            return;
+        }
+        boolean swapped;
+        do {
+            swapped = false;
+            Node current = head;
+            while (current.next != null) {
+                if (current.data.getBasicSalary() < current.next.data.getBasicSalary()) {
+                    Employee temp = current.data;
+                    current.data = current.next.data;
+                    current.next.data = temp;
+                    swapped = true;
+                }
+                current = current.next;
+            }
+        } while (swapped);
+    }
+
+    /**
      * Displays all employees by traversing the linked list.
      */
     public void displayAllEmployees() {
